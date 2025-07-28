@@ -5,8 +5,9 @@
 This project is based on a real-world speed dating experiment held at Columbia University.  
 Using Python and data visualization tools, we explore how people choose a potential partner and what influences their decisions.
 
-> **The goal?**  
-> To understand what people say they want in a partner, what actually drives a match, and how perceptions (both self and social) align with outcomes.
+#The goal?
+
+To understand what people say they want in a partner, what actually drives a match, and how perceptions (both self and social) align with outcomes.
 
 
 
