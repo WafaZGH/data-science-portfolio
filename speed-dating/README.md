@@ -9,8 +9,6 @@ Using Python and data visualization tools, we explore how people choose a potent
 
 To understand what people say they want in a partner, what actually drives a match, and how perceptions (both self and social) align with outcomes.
 
-
-
 ##  Project Objectives
 
 - Analyze what individuals *say* they want in a partner vs. what actually leads to a match  
@@ -20,16 +18,12 @@ To understand what people say they want in a partner, what actually drives a mat
 - Explore whether meeting someone earlier in the evening impacts match success  
 - Assess how social behaviors and hobbies relate to dating preferences  
 
-
-
 ##  Methods & Techniques
 
 - Data cleaning (handling NaNs, merging partner traits, mapping categorical labels)
 - Grouped statistics and gender-based segmentation
 - Visualizations: bar plots, heatmaps, radar/spider charts
 - Exploratory analysis on preferences, ratings, and actual outcomes
-
-
 
 ## Key Insights
 
@@ -38,14 +32,11 @@ To understand what people say they want in a partner, what actually drives a mat
 - Meeting someone earlier in the evening gave a slight advantage, but personality had a stronger impact  
 - Preferences varied by gender, but shared experiences were valued across the board  
 
-
-
 ## Notebook Structure
 
 1. **Participant expectations vs. actual outcomes**
 2. **Match drivers:** race, religion, career, field of study, interests
 3. **Social activity, hobbies, and dating dynamics**
-
 
 
 ##  Tech Stack
@@ -54,7 +45,7 @@ To understand what people say they want in a partner, what actually drives a mat
 - `Pandas`, `NumPy`
 - `Seaborn`, `Matplotlib`, `Plotly`
 
----
+
 
 📁 _Notebook: `01-Speed_Dating_projet_final_version.ipynb`_  
 📂 _Dataset: `Speed+Dating+Data.csv` + variable documentation_
