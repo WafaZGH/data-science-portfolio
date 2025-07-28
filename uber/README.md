@@ -9,7 +9,7 @@ By analyzing ride data from April to September 2014, we help optimize driver pos
 
 To detect spatial and temporal patterns in Uber ride data and define optimal pickup zones using clustering methods like **KMeans** and **DBSCAN**.
 
----
+
 
 ## Dataset
 
@@ -49,7 +49,7 @@ To detect spatial and temporal patterns in Uber ride data and define optimal pic
    - Interactive hourly density maps (Plotly)
    - Showed how hot zones shift over the day
 
----
+
 
 ## Key Insights
 
@@ -58,7 +58,7 @@ To detect spatial and temporal patterns in Uber ride data and define optimal pic
 - Weekends show broader pickup distribution across boroughs  
 - **DBSCAN** is effective for noise filtering and finding irregular clusters
 
----
+
 
 ##  Tools & Libraries
 
@@ -67,7 +67,7 @@ To detect spatial and temporal patterns in Uber ride data and define optimal pic
 - **Plotly** for interactive maps
 - **Seaborn**, **Matplotlib** for visualizations
 
----
+
 
 📁 _Notebook: `uber-pickups.ipynb`_  
 📂 _Data files: 6 monthly CSVs merged into one_
