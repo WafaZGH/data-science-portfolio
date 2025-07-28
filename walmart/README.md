@@ -50,7 +50,7 @@ This project explores historical sales data from 45 Walmart stores across the U.
 - Improved model **interpretability**
 - Automatically removed less impactful features by setting coefficients to zero
 
----
+
 
 ## Key Takeaways
 
@@ -66,7 +66,7 @@ This project explores historical sales data from 45 Walmart stores across the U.
 - Explore non-linear models: **Random Forest**, **XGBoost**  
 - Build a pipeline for **automated, real-time forecasting**
 
----
+
 
 ## 📁 File Structure
 
