@@ -70,6 +70,6 @@ To detect spatial and temporal patterns in Uber ride data and define optimal pic
 
 
 📁 _Notebook: `uber-pickups.ipynb`_  
-📂 _Data files: 6 monthly CSVs _
+
 
 
