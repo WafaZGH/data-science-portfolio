@@ -1,7 +1,5 @@
 # Speed Dating Analysis Project
 
-#  Speed Dating Analysis
-
 This project is based on a real-world speed dating experiment held at Columbia University.  
 Using Python and data visualization tools, we explore how people choose a potential partner and what influences their decisions.
 
