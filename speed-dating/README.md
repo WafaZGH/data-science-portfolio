@@ -18,8 +18,8 @@ To understand what people say they want in a partner, what actually drives a mat
 
 ##  Methods & Techniques
 
-- Data cleaning (handling NaNs, merging partner traits, mapping categorical labels)
-- Grouped statistics and gender-based segmentation
+- Data cleaning 
+- Grouped statistics and gender based segmentation
 - Visualizations: bar plots, heatmaps, radar/spider charts
 - Exploratory analysis on preferences, ratings, and actual outcomes
 
