@@ -1,2 +1,6 @@
 # data-science-portfolio
-A personal collection of end-to-end data science projects built with Python, Jupyter, and machine learning tools. Each project tackles a real-world problem through data exploration, modeling, and clear, actionable insights.
+
+
+Welcome to my personal collection of data science projects 
+Each one was built with Python, Jupyter, and a lot of curiosity.  
+From exploring real-world data to building predictive models, these projects helped me learn, grow, and apply what I’ve studied.
