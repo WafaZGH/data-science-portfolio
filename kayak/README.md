@@ -3,7 +3,7 @@
 This project was part of my data science training.  
 The goal was to help travelers choose the best destinations in France by combining **7-day weather forecasts** and **hotel availability**, and visualizing the results on an interactive map.
 
----
+
 
 ## The Challenge
 We worked with two datasets stored in PostgreSQL:
@@ -16,7 +16,7 @@ Objectives:
 2. Select the **Top-20 hotels** for each of those cities  
 3. Display everything on a single interactive Plotly map  
 
----
+
 
 ## Context
 The pipeline combines:
@@ -25,7 +25,7 @@ The pipeline combines:
 
 Data was stored in PostgreSQL, then transformed and visualized to create a simple travel planning guide.
 
----
+
 
 ## My Approach
 
@@ -44,7 +44,7 @@ Data was stored in PostgreSQL, then transformed and visualized to create a simpl
   - 🔵 Blue markers → Top-5 cities  
   - 🔴 Red markers → Top-20 hotels (hover shows hotel name)  
 
----
+
 
 ## What I Learned
 - Building a small ETL pipeline (API ingestion + scraping → SQL)  
@@ -52,7 +52,7 @@ Data was stored in PostgreSQL, then transformed and visualized to create a simpl
 - Creating clean, interactive maps with Plotly Mapbox  
 - Handling scraping nuances (headers, polite delays, etc.)  
 
----
+
 
 ## Files
 - `Kayak.ipynb` → main notebook  
@@ -60,7 +60,7 @@ Data was stored in PostgreSQL, then transformed and visualized to create a simpl
 - `data/all_cities_hotels.csv` → hotels export  
 - `README.md` → this file  
 
----
+
 
 ## Next Steps
 
