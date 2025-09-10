@@ -3,7 +3,7 @@
 This project was part of my data science training.
 The goal was to analyze the Steam gaming platform dataset, exploring trends in game releases, reviews, prices, and languages, and to create insights into what drives game popularity.
 
-The Challenge
+## The Challenge
 
 We worked with a large dataset of Steam games containing:
 
@@ -25,7 +25,7 @@ Identify patterns in discounts and their relation to user engagement.
 
 Visualize the most common languages and top-performing games.
 
-Context
+## Context
 
 The pipeline combines:
 
@@ -37,7 +37,7 @@ Visualization libraries (Matplotlib, Plotly) → to highlight key insights
 
 The project focuses on making sense of raw platform data and extracting useful business and market insights for the gaming industry.
 
-My Approach
+## My Approach
 1. Data Preparation
 
 Parsed nested JSON into a clean base DataFrame (df_base).
