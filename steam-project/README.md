@@ -1,4 +1,4 @@
-Steam Games Analysis 
+## Steam Games Analysis 
 
 This project was part of my data science training.
 The goal was to analyze the Steam gaming platform dataset, exploring trends in game releases, reviews, prices, and languages, and to create insights into what drives game popularity.
@@ -74,4 +74,4 @@ Trends → Releases by year, growth in publishers and platforms.
 ## Project Assets
 
 - Notebook (Databricks): https://dbc-be649761-69e7.cloud.databricks.com/editor/notebooks/3059052065921878?o=4205469511372996
-- Main notebook file: [notebooks/steam_project.ipynb](steam_project.ipynb)
+  
