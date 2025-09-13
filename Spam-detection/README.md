@@ -35,7 +35,7 @@ The objective of this project is to build a spam detector that automatically fla
 o	Accuracy ≈ 98%
 o	Very strong on spam recall → CNN captured local n-gram features
 
- #Conclusion: 
+ # Conclusion: 
  
  CNN + Embedding is the best-performing model under our constraints.
  TF-IDF + LR remains the most interpretable and efficient baseline.
