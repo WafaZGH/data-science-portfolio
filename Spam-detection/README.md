@@ -1,4 +1,4 @@
-## mail Spam Detection
+## Mail Spam Detection
 
 # Goal
 
