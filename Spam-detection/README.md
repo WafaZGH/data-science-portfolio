@@ -1,22 +1,22 @@
-mail Spam Detection
+## mail Spam Detection
 
-#Goal
+# Goal
 
 The objective of this project is to build a spam detector that automatically flags spam messages based solely on the mails text content.
  
-#Dataset
+# Dataset
 
 •	Source: SMS Spam Collection Dataset 
 •	Size: 5,572 messages (≈ 87% ham, 13% spam)
 •	Challenge: class imbalance (ham >> spam)
  
-#Preprocessing Steps
+# Preprocessing Steps
 
 •	Text cleaning (lowercasing, punctuation removal, stopwords removal)
 •	Tokenization & Lemmatization
 •	Train/test split (80/20)
  
-#Models & Results
+# Models & Results
 
  1. Baseline: TF-IDF + Logistic Regression
 •	Vectorized SMS with TF-IDF
