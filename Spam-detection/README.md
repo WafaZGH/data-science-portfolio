@@ -1,62 +1,67 @@
-## Mail Spam Detection
+## Mail Spam Detector
 
-# Goal
+## Goal
 
-The objective of this project is to build a spam detector that automatically flags spam messages based solely on the mails text content.
- 
-# Dataset
+Build a spam mail detector that automatically flags messages as ham (normal) or spam, based solely on their text content.
 
-•	Source: SMS Spam Collection Dataset 
-•	Size: 5,572 messages (≈ 87% ham, 13% spam)
-•	Challenge: class imbalance (ham >> spam)
- 
-# Preprocessing Steps
+## Models Tested
 
-•	Text cleaning (lowercasing, punctuation removal, stopwords removal)
-•	Tokenization & Lemmatization
-•	Train/test split (80/20)
- 
-# Models & Results
+1. Baselines (Traditional NLP)
 
- 1. Baseline: TF-IDF + Logistic Regression
-•	Vectorized SMS with TF-IDF
-•	Trained a Logistic Regression classifier
-•	Result: High accuracy with strong spam recall → strong baseline
+TF-IDF + Logistic Regression → first baseline model.
 
- 2. TF-IDF + Random Forest / XGBoost
-•	Used same TF-IDF features with Random Forest and XGBoost
-•	Captured more complex interactions
-•	Result: Similar or slightly better accuracy than LR, but higher training cost
+TF-IDF + Random Forest → more robust tree-based model.
 
- 3. Embedding + CNN
-•	Represented text with trainable embeddings (20,000 vocab, 100 tokens max)
-•	Applied Conv1D + GlobalMaxPooling + Dense layers
-•	Result:
-o	Accuracy ≈ 98%
-o	Very strong on spam recall → CNN captured local n-gram features
+TF-IDF + XGBoost → gradient boosting for stronger performance.
 
- # Conclusion: 
- 
- CNN + Embedding is the best-performing model under our constraints.
- TF-IDF + LR remains the most interpretable and efficient baseline.
- 
-# Future Work / Limitations
+2. Deep Learning
 
-We also experimented with BERT (transfer learning) but results were limited:
+Embedding + CNN → strong results (~98% accuracy).
 
-•	Only trained 3 epochs due to time/compute limits → low spam recall
-•	Large models like BERT need longer fine-tuning and class balancing to work well on small, imbalanced datasets
+3. Transfer Learning
 
-# Next Steps to Improve BERT
+BERT
 
-•	Train longer (5–10 epochs) with early stopping
-•	Use DistilBERT (lighter, faster)
-•	Collect or augment more spam data
- 
-# Key Takeaways
+Results were weaker than CNN and DistilBERT.
 
-•	Traditional ML (TF-IDF + LR) is strong and interpretable
+⚠️ Note: Only trained for 3 epochs due to limited resources.
 
-•	Deep learning (Embedding + CNN) achieves the highest accuracy
+This short training time explains the low recall and precision for spam detection.
 
-•	Transfer learning (BERT) shows potential, but requires more resources to outperform lighter models
+With more epochs and fine-tuning, BERT is expected to perform significantly better.
+
+DistilBERT (a lightweight version of BERT)
+
+Results: ~98.6% accuracy after 6 epochs.
+
+Stronger contextual understanding than TF-IDF.
+
+More efficient than BERT, with better performance in this project.
+
+## Comparative Results
+
+Model	Accuracy
+TF-IDF + Logistic Regression	~95%
+TF-IDF + Random Forest	~96%
+TF-IDF + XGBoost	~97%
+CNN (Embedding)	~98%
+DistilBERT (Transfer Learning)	~98.6%
+BERT (3 epochs, limited run)	~86%
+
+## Conclusion
+
+Classical TF-IDF approaches are solid but lack contextual understanding.
+
+CNN with embeddings achieves very high accuracy.
+
+DistilBERT slightly outperforms CNN and shows the power of Transfer Learning in NLP.
+
+BERT underperformed in this project only because of time/computation limits. With more training, it would likely surpass CNN and DistilBERT.
+
+## Next steps / Future work:
+
+Train BERT and DistilBERT with more epochs.
+
+Experiment with full BERT fine-tuning.
+
+
