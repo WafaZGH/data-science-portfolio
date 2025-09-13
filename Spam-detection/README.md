@@ -53,8 +53,10 @@ We also experimented with BERT (transfer learning) but results were limited:
 •	Use DistilBERT (lighter, faster)
 •	Collect or augment more spam data
  
-📌 Key Takeaways
+# Key Takeaways
 
 •	Traditional ML (TF-IDF + LR) is strong and interpretable
+
 •	Deep learning (Embedding + CNN) achieves the highest accuracy
+
 •	Transfer learning (BERT) shows potential, but requires more resources to outperform lighter models
