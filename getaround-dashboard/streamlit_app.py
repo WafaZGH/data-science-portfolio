@@ -10,20 +10,26 @@ st.set_page_config(page_title="Getaround — Buffer Simulator", layout="wide")
 # -----------------------------
 # Data loader
 # -----------------------------
+from pathlib import Path
+
 @st.cache_data
-def load_data(path: str):
-    df = pd.read_csv(path)
-    # Ensure numeric
+def load_data():
+    data_path = Path(__file__).parent / "delays_clean.csv"
+    df = pd.read_csv(data_path)
+
+    # Convert to numeric just in case
     for c in ["delay_at_checkout_in_minutes", "time_delta_with_previous_rental_in_minutes"]:
         df[c] = pd.to_numeric(df[c], errors="coerce")
+
     df = df.dropna(subset=["delay_at_checkout_in_minutes", "time_delta_with_previous_rental_in_minutes"])
-    # Helper flags
-    df["checkin_type"] = df["checkin_type"].str.lower()
+
+    # Create helper columns
     df["late_return"] = df["delay_at_checkout_in_minutes"] > 0
     df["conflict"] = df["delay_at_checkout_in_minutes"] > df["time_delta_with_previous_rental_in_minutes"]
+
     return df
 
-df = load_data("delays_clean.csv")
+df = load_data()
 
 # -----------------------------
 # Sidebar controls
