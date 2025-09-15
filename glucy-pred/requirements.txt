@@ -23,3 +23,5 @@ torch
 torchvision
 sentence-transformers
 transformers
+requests
+
