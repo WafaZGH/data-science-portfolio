@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+.env
+models/
+runs/
+data/train/
+data/val/
+data/test/
+*.pt
+*.onnx
