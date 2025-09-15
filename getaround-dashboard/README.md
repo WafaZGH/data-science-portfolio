@@ -57,6 +57,6 @@ uvicorn app:app --reload
 
 ✅ Dashboard in production → https://data-science-portfolio-6pt67zlgrwfsmv5ae5kb44.streamlit.app/
 
-✅ Code on GitHub → https://github.com/WafaZGH/data-science-portfolio
+✅ Code on GitHub → https://github.com/WafaZGH/data-science-portfolio/tree/main/getaround-dashboard
 
 ✅ Documented API → https://wafa2025-getaround-pricing-api.hf.space/docs
