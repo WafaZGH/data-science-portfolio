@@ -1,9 +1,9 @@
-🚗 Getaround Pricing & Delay Analysis Project
+## Getaround Pricing & Delay Analysis Project
 
 This project was developed as part of a Fullstack Data Science certification.
 It addresses two main business challenges for Getaround:
 
-Car Delays Analysis Dashboard
+# Car Delays Analysis Dashboard
 
 Exploratory Data Analysis (EDA) on car rental delays.
 
@@ -15,9 +15,9 @@ Car features impact on delays
 
 Insights to improve fleet management.
 
-✅ Live app: Streamlit Dashboard
+✅ Live app: [Streamlit Dashboard](https://data-science-portfolio-6pt67zlgrwfsmv5ae5kb44.streamlit.app/)
 
-Car Pricing Prediction API
+# Car Pricing Prediction API
 
 Machine Learning model (Random Forest) trained on car features to predict rental price per day.
 
@@ -25,12 +25,10 @@ Model trained in Google Colab, exported with joblib.
 
 API built with FastAPI and deployed on Hugging Face Spaces.
 
-✅ Live API Docs: Swagger UI
+✅ Live API Docs: https://wafa2025-getaround-pricing-api.hf.space/docs
 
 
-
-
-🛠️ Tech Stack
+# Tech Stack
 
 Python 3.9
 
@@ -44,7 +42,7 @@ Hugging Face Spaces (Docker) for deployment
 
 Google Colab for training
 
-🚀 How to Run Locally
+# How to Run Locally
 Dashboard
 cd getaround-dashboard
 pip install -r requirements.txt
@@ -55,10 +53,10 @@ cd getaround-pricing-api
 pip install -r requirements.txt
 uvicorn app:app --reload
 
-📌 Deliverables
+# Deliverables
 
-✅ Dashboard in production → Streamlit App
+✅ Dashboard in production → https://data-science-portfolio-6pt67zlgrwfsmv5ae5kb44.streamlit.app/
 
-✅ Code on GitHub → Repository
+✅ Code on GitHub → https://github.com/WafaZGH/data-science-portfolio
 
-✅ Documented API → Swagger Docs
+✅ Documented API → https://wafa2025-getaround-pricing-api.hf.space/docs
