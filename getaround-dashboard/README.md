@@ -26,6 +26,7 @@ Model trained in Google Colab, exported with joblib.
 API built with FastAPI and deployed on Hugging Face Spaces.
 
 ✅ Live API Docs: https://wafa2025-getaround-pricing-api.hf.space/docs
+✅ Hugging Face Space Code: https://huggingface.co/spaces/wafa2025/getaround-pricing-api/tree/main
 
 
 # Tech Stack
