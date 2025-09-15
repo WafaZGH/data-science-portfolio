@@ -1,0 +1,118 @@
+# YOLO dataset config (109 classes, incl. plate/fork)
+# Chemins relatifs (dans le repo) — le dataset complet restera hébergé ailleurs.
+
+train: data/train/images
+val: data/val/images
+test: data/test/images
+
+nc: 109
+names:
+  - fork
+  - class_ass_195
+  - class_ass_215
+  - class_ass_230
+  - class_ass_255
+  - class_ass_270
+  - chicken
+  - rice
+  - snow peas
+  - sauce
+  - potato
+  - cucumber
+  - onion
+  - bread
+  - pie
+  - carrot
+  - asparagus
+  - broccoli
+  - steak
+  - french beans
+  - white button mushroom
+  - tomato
+  - cilantro mint
+  - sausage
+  - corn
+  - cheese butter
+  - egg
+  - strawberry
+  - pork
+  - green beans
+  - biscuit
+  - french fries
+  - ice cream
+  - lettuce
+  - garlic
+  - fish
+  - lemon
+  - shellfish
+  - spring onion
+  - juice
+  - pepper
+  - other ingredients
+  - cauliflower
+  - pumpkin
+  - apple
+  - banana
+  - orange
+  - celery stick
+  - blueberry
+  - rape
+  - noodles
+  - soup
+  - milk
+  - fried meat
+  - kiwi
+  - shrimp
+  - pizza
+  - avocado
+  - hanamaki baozi
+  - chocolate
+  - cake
+  - salad
+  - grape
+  - oyster mushroom
+  - pineapple
+  - lamb
+  - coffee
+  - cabbage
+  - milkshake
+  - peach
+  - white radish
+  - tea
+  - ginger
+  - wine
+  - cherry
+  - shiitake
+  - mango
+  - raspberry
+  - pasta
+  - pear
+  - red beans
+  - watermelon
+  - candy
+  - bean sprouts
+  - date
+  - dried cranberries
+  - pudding
+  - melon
+  - eggplant
+  - soy
+  - almond
+  - okra
+  - olives
+  - walnut
+  - wonton dumplings
+  - tofu
+  - crab
+  - fig
+  - hamburg
+  - peanut
+  - apricot
+  - king oyster mushroom
+  - egg tart
+  - cashew
+  - enoki mushroom
+  - seaweed
+  - bamboo shoots
+  - popcorn
+  - kelp
