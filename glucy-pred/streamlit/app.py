@@ -3,27 +3,26 @@ from PIL import Image
 from io import BytesIO
 import base64, requests, pandas as pd
 
-# --------- Config ---------
+# ==================== CONFIG ====================
 st.set_page_config(page_title="GluciPred", page_icon="🍝", layout="wide")
-
-# Endpoint par défaut (modifiable dans la sidebar)
 DEFAULT_API = "https://data-jed-api-glucipred.hf.space/predict/image"
 
-# --------- State ---------
 if "results_df" not in st.session_state:
     st.session_state.results_df = pd.DataFrame()
 if "annotated_bytes" not in st.session_state:
     st.session_state.annotated_bytes = None
+if "diag" not in st.session_state:
+    st.session_state.diag = {}
 
-# --------- Sidebar ---------
+# ==================== SIDEBAR ====================
 with st.sidebar:
     st.header("⚙️ Paramètres")
     api_url = st.text_input("API endpoint", DEFAULT_API)
     total_weight = st.slider("Poids total estimé (g)", 150, 800, 350, 10)
     debug = st.checkbox("Mode debug", value=False)
-    st.caption("Astuce : si /predict ne marche pas, essaie /predict/image (avec ou sans / final).")
+    st.caption("Astuce : si 404, teste aussi le slash final /predict/image/")
 
-# --------- Header ---------
+# ==================== HEADER ====================
 st.markdown(
     """
     <div style="text-align:center;margin:6px 0 16px 0">
@@ -33,26 +32,16 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-# (Optionnel) GIF bannière si présent dans le dossier
 try:
     st.image("glucy_final_loop.gif", use_container_width=True)
 except Exception:
     pass
 
-# --------- Helpers ---------
+# ==================== HELPERS ====================
 def _b64(x: bytes) -> str:
     return base64.b64encode(x).decode("utf-8")
 
 def call_api(api_url: str, img_bytes: bytes, total_weight_g: int):
-    """
-    Essaie plusieurs formats :
-      1) multipart/form-data -> files={'file':(...)} + data
-      2) multipart/form-data -> files={'image':(...)} + data
-      3) JSON -> {'image_base64': '...'}
-      4) JSON -> {'image': '...'}
-      5) JSON -> {'image_b64': '...'}
-    """
     tries = [
         ("multipart:file", dict(files={"file": ("image.jpg", img_bytes, "image/jpeg")},
                                 data={"total_weight_g": total_weight_g})),
@@ -79,7 +68,6 @@ def call_api(api_url: str, img_bytes: bytes, total_weight_g: int):
     raise last
 
 def _get_first(js: dict, keys: list):
-    """Retourne la première clé trouvée, au niveau racine puis sous result/data."""
     for k in keys:
         if k in js:
             return js[k]
@@ -92,56 +80,35 @@ def _get_first(js: dict, keys: list):
     return None
 
 def parse_response(js: dict):
-    """
-    Normalise la réponse :
-      - Image b64 : 'segmentated_image' | 'annotated_image' | 'image_b64' | 'image'
-      - Items : 'labels_and_weights' | 'items' | 'objects' | 'aliments' | 'predictions' | 'detections'
-    Retourne (annotated_bytes, df)
-    """
     if debug:
         st.write("🔎 JSON keys:", list(js.keys()))
 
-    # image annotée
     b64 = _get_first(js, ["segmentated_image", "annotated_image", "image_b64", "image"])
     annotated_bytes = base64.b64decode(b64) if isinstance(b64, str) else None
 
-    # items
     rows = _get_first(js, ["labels_and_weights", "items", "objects", "aliments", "predictions", "detections"])
-
-    # liste simple de strings ?
     if isinstance(rows, list) and rows and isinstance(rows[0], str):
         df = pd.DataFrame({"label": rows})
     else:
         df = pd.DataFrame(rows or [])
 
-    # mapping colonnes → noms standard
     rename_map = {
-        "poids": "weight_g",
-        "poids_g": "weight_g",
-        "weight": "weight_g",
-        "pourcentage": "percent_total",
-        "pourcentage_total": "percent_total",
-        "percent": "percent_total",
-        "percentage": "percent_total",
-        "class": "label",
-        "name": "label",
-        "label_name": "label",
-        "class_name": "label",
-        "conf": "confidence",
-        "confidence_score": "confidence",
-        "score": "confidence",
+        "poids": "weight_g", "poids_g": "weight_g", "weight": "weight_g",
+        "pourcentage": "percent_total", "pourcentage_total": "percent_total",
+        "percent": "percent_total", "percentage": "percent_total",
+        "ratio": "area_ratio", "area_percent": "percent_total",
+        "class": "label", "name": "label", "label_name": "label", "class_name": "label",
+        "conf": "confidence", "confidence_score": "confidence", "score": "confidence",
+        "mask_area": "area_pixels", "area": "area_pixels"
     }
     for k, v in rename_map.items():
         if k in df.columns and v not in df.columns:
             df[v] = df[k]
 
-    # ordre agréable si colonnes présentes
-    order = [c for c in ["label", "percent_total", "weight_g", "carbs_g", "confidence"] if c in df.columns]
-    if order:
-        df = df[order]
+    st.session_state.diag["parsed_cols"] = list(df.columns)
     return annotated_bytes, df
 
-# --------- Nutrition loaders (cached) ---------
+# ---------- Nutrition loaders ----------
 @st.cache_data
 def load_ciqual(path="glucy-pred/data/lookup/ciqual_nutrition.csv"):
     try:
@@ -172,55 +139,99 @@ def load_gi(path="glucy-pred/data/lookup/glycemic_index.csv"):
     out["gi"] = pd.to_numeric(df[gi_col], errors="coerce")
     return out.dropna()
 
+ALIASES = {
+    "potato": "pomme de terre",
+    "broccoli": "brocoli",
+    "cauliflower": "chou-fleur",
+    "rice": "riz",
+    "tomato": "tomate",
+    "carrot": "carotte",
+    "chicken": "poulet",
+    "beef": "boeuf",
+    "pork": "porc",
+    "fish": "poisson",
+    "shrimp": "crevette",
+    "cheese": "fromage",
+    "bread": "pain",
+    "egg": "oeuf",
+    "apple": "pomme",
+    "banana": "banane",
+    "lettuce": "laitue",
+    "cucumber": "concombre",
+    "mushroom": "champignon",
+    "milk": "lait",
+    "yogurt": "yaourt",
+    "pasta": "pâtes",
+    "corn": "maïs",
+    "peas": "petit pois",
+    "beans": "haricot",
+    "strawberry": "fraise",
+    "blueberry": "myrtille",
+}
+
+def _ensure_percent(df: pd.DataFrame):
+    if "percent_total" in df.columns:
+        return df
+    # ratios (0..1) ?
+    for c in ["area_ratio"]:
+        if c in df.columns:
+            r = pd.to_numeric(df[c], errors="coerce")
+            df["percent_total"] = (r * 100.0) if r.max(skipna=True) is not None and r.max(skipna=True) <= 1.5 else r
+            return df
+    # aires absolues -> normaliser
+    for c in ["area_pixels"]:
+        if c in df.columns:
+            a = pd.to_numeric(df[c], errors="coerce")
+            s = a.sum(skipna=True)
+            if s and s > 0:
+                df["percent_total"] = 100.0 * a / s
+            return df
+    return df
+
 def enrich_with_nutrition(df_in: pd.DataFrame, total_weight_g: int) -> pd.DataFrame:
-    """Complète weight_g si absent, calcule carbs_g via CIQUAL, ajoute GI si dispo."""
     df = df_in.copy()
 
-    # normaliser label
     if "label" not in df.columns:
         for c in ["name","class","class_name","label_name"]:
             if c in df.columns:
                 df["label"] = df[c].astype(str)
                 break
 
-    # compléter weight_g
-    if "weight_g" not in df.columns:
-        # si percent_total existe → calculer un poids
-        if "percent_total" in df.columns:
-            perc = pd.to_numeric(df["percent_total"], errors="coerce")
-            # si ce sont des ratios (<= 1.5), convertir en %
-            if perc.max(skipna=True) is not None and perc.max(skipna=True) <= 1.5:
-                perc = perc * 100.0
-            df["weight_g"] = total_weight_g * (perc / 100.0)
-        else:
-            # tenter autres noms
-            for c in ["poids","poids_g","weight"]:
-                if c in df.columns:
-                    df["weight_g"] = pd.to_numeric(df[c], errors="coerce")
-                    break
+    df = _ensure_percent(df)
 
-    # si toujours pas de poids → on ne peut pas calculer les glucides
-    if "weight_g" not in df.columns:
-        return df
+    # weight_g
+    if "weight_g" not in df.columns and "percent_total" in df.columns:
+        perc = pd.to_numeric(df["percent_total"], errors="coerce")
+        if perc.max(skipna=True) is not None and perc.max(skipna=True) <= 1.5:
+            perc = perc * 100.0
+        df["weight_g"] = total_weight_g * (perc / 100.0)
 
-    # CIQUAL : carbs_per_100g
-    ciqual = load_ciqual()
-    if not ciqual.empty and "label" in df.columns:
+    if "weight_g" not in df.columns:
+        return df  # impossible de calculer les glucides
+
+    # normaliser clé d'appariement
+    if "label" in df.columns:
         df["__k"] = df["label"].astype(str).str.strip().str.lower()
-        df = df.merge(ciqual, left_on="__k", right_on="food", how="left").drop(columns=["__k","food"])
+        df["__k"] = df["__k"].map(lambda x: ALIASES.get(x, x))
+
+    # CIQUAL
+    ciqual = load_ciqual()
+    if not ciqual.empty and "__k" in df.columns:
+        df = df.merge(ciqual, left_on="__k", right_on="food", how="left").drop(columns=["food"])
         if "carbs_g" not in df.columns and "carbs_per_100g" in df.columns:
             df["carbs_g"] = df["weight_g"] * df["carbs_per_100g"] / 100.0
 
     # IG optionnel
     gi = load_gi()
-    if not gi.empty and "label" in df.columns and "gi" not in df.columns:
-        df["__k"] = df["label"].astype(str).str.strip().str.lower()
-        df = df.merge(gi, left_on="__k", right_on="food", how="left").drop(columns=["__k","food"])
+    if not gi.empty and "__k" in df.columns and "gi" not in df.columns:
+        df = df.merge(gi, left_on="__k", right_on="food", how="left").drop(columns=["food"])
 
+    # ordre propre
     cols = [c for c in ["label","percent_total","weight_g","carbs_g","gi","confidence"] if c in df.columns]
+    st.session_state.diag["enriched_cols"] = list(df.columns)
     return df[cols] if cols else df
 
-# --------- UI ---------
+# ==================== UI ====================
 left, right = st.columns([1, 1])
 
 with left:
@@ -233,11 +244,12 @@ with left:
         with st.spinner("Appel API…"):
             try:
                 js = call_api(api_url, img_bytes, total_weight)
-                ann, df = parse_response(js)
-                # enrichissement local (poids / glucides / IG)
-                df = enrich_with_nutrition(df, total_weight)
+                ann, df_parsed = parse_response(js)
+                df = enrich_with_nutrition(df_parsed, total_weight)
                 st.session_state.annotated_bytes = ann
                 st.session_state.results_df = df
+                st.session_state.diag["parsed_head"] = df_parsed.head(5).to_dict(orient="list")
+                st.session_state.diag["final_head"] = df.head(5).to_dict(orient="list")
                 st.success("Terminé ✅")
             except Exception as e:
                 st.error(f"Erreur API : {e}")
@@ -265,4 +277,10 @@ with right:
     if st.session_state.annotated_bytes:
         st.caption("Segmentation")
         st.image(Image.open(BytesIO(st.session_state.annotated_bytes)), use_container_width=True)
+
+# ==================== DIAGNOSTICS ====================
+with st.expander("🛠️ Diagnostics"):
+    for k, v in st.session_state.diag.items():
+        st.write(f"**{k}**:", v)
+
 
