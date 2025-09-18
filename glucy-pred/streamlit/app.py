@@ -1,7 +1,8 @@
 # =========================================================
-# GluciPred - Streamlit app (from scratch, robust version)
+# GluciPred - Streamlit app (clean ASCII version)
 # =========================================================
-import base64, json
+import json
+import base64
 from io import BytesIO
 
 import pandas as pd
@@ -27,7 +28,7 @@ with st.sidebar:
     api_url = st.text_input("API endpoint", DEFAULT_API)
     total_weight = st.slider("Poids total estimé (g)", 150, 800, 350, 10)
     debug = st.checkbox("Mode debug", value=False)
-    st.caption("Astuce : si 404, teste aussi /predict/image/ avec un slash final.")
+    st.caption("Tip: if 404, also try a trailing slash: /predict/image/")
 
 # ------------------ HEADER ------------------
 st.markdown(
@@ -39,6 +40,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+# Optional banner GIF
 try:
     st.image("glucy_final_loop.gif", use_container_width=True)
 except Exception:
@@ -50,7 +52,7 @@ def _b64(x: bytes) -> str:
 
 def call_api(api_url: str, img_bytes: bytes, total_weight_g: int):
     """
-    Essaie plusieurs formats de payload pour maximiser la compatibilité.
+    Try multiple payload shapes to maximize compatibility with the API.
     """
     tries = [
         ("multipart:file", dict(files={"file": ("image.jpg", img_bytes, "image/jpeg")},
@@ -73,7 +75,6 @@ def call_api(api_url: str, img_bytes: bytes, total_weight_g: int):
                 st.write((r.text or "")[:1200])
             r.raise_for_status()
             js = r.json()
-            # garde un aperçu brut dans Diagnostics
             st.session_state.diag["raw_json_preview"] = json.dumps(js)[:1500]
             return js
         except Exception as e:
@@ -81,8 +82,7 @@ def call_api(api_url: str, img_bytes: bytes, total_weight_g: int):
     raise last
 
 def _get_first(js: dict, keys: list):
-    """Retourne la première valeur trouvée parmi `keys`
-       au niveau racine puis sous result/data."""
+    """Return first existing key among `keys`, at root or under common wrappers."""
     for k in keys:
         if k in js:
             return js[k]
@@ -95,7 +95,7 @@ def _get_first(js: dict, keys: list):
     return None
 
 def _walk_lists_of_dicts(obj):
-    """Cherche récursivement des listes de dicts dans un JSON arbitraire."""
+    """Recursively find lists of dicts inside an arbitrary JSON tree."""
     found = []
     if isinstance(obj, list):
         if obj and isinstance(obj[0], dict):
@@ -109,42 +109,43 @@ def _walk_lists_of_dicts(obj):
 
 def parse_response(js: dict):
     """
-    Renvoie (annotated_bytes, df) où df = DataFrame brut AVANT enrichissement.
+    Return (annotated_bytes, df) where df is the raw DataFrame before enrichment.
     """
-    # image annotée (si fournie)
+    # annotated image
     b64 = _get_first(js, ["segmentated_image", "annotated_image", "image_b64", "image"])
     annotated_bytes = base64.b64decode(b64) if isinstance(b64, str) else None
 
-    # 1) clés usuelles
+    # first try standard keys
     rows = _get_first(js, ["labels_and_weights", "items", "objects", "aliments", "predictions", "detections"])
-    # 2) sinon fouille récursive
+    # otherwise, search recursively
     if rows is None:
         candidates = _walk_lists_of_dicts(js)
         rows = candidates[0] if candidates else None
 
-    # dataframe
+    # build dataframe
     if isinstance(rows, list) and rows and isinstance(rows[0], str):
         df = pd.DataFrame({"label": rows})
     else:
         df = pd.DataFrame(rows or [])
 
-    # mapping colonnes → noms standard
+    # normalize common column names
     rename_map = {
         # labels
         "class": "label", "name": "label", "label_name": "label", "class_name": "label",
-        # confiance
+        # confidence
         "conf": "confidence", "confidence_score": "confidence", "score": "confidence",
-        # poids
+        # weight
         "poids": "weight_g", "poids_g": "weight_g", "weight": "weight_g",
-        # % / ratio / aire
+        # percent / ratio / area
         "pourcentage": "percent_total", "pourcentage_total": "percent_total",
         "percent": "percent_total", "percentage": "percent_total",
         "area_percent": "percent_total",
         "ratio": "area_ratio", "proportion": "area_ratio",
         "mask_area": "area_pixels", "area": "area_pixels",
-        # bboxes courantes
-        "x1":"x1","y1":"y1","x2":"x2","y2":"y2","width":"width","height":"height","w":"width","h":"height",
-        "bbox":"bbox"
+        # bboxes
+        "x1": "x1", "y1": "y1", "x2": "x2", "y2": "y2",
+        "width": "width", "height": "height", "w": "width", "h": "height",
+        "bbox": "bbox",
     }
     for k, v in rename_map.items():
         if k in df.columns and v not in df.columns:
@@ -159,11 +160,11 @@ def load_ciqual(path="glucy-pred/data/lookup/ciqual_nutrition.csv"):
     try:
         df = pd.read_csv(path)
     except Exception:
-        return pd.DataFrame(columns=["food","carbs_per_100g"])
-    name_col = next((c for c in ["food","aliment","Aliment","label","name"] if c in df.columns), None)
-    carbs_col = next((c for c in ["carbs_per_100g","Glucides (g/100g)","glucides_100g","carbs"] if c in df.columns), None)
+        return pd.DataFrame(columns=["food", "carbs_per_100g"])
+    name_col = next((c for c in ["food", "aliment", "Aliment", "label", "name"] if c in df.columns), None)
+    carbs_col = next((c for c in ["carbs_per_100g", "Glucides (g/100g)", "glucides_100g", "carbs"] if c in df.columns), None)
     if not name_col or not carbs_col:
-        return pd.DataFrame(columns=["food","carbs_per_100g"])
+        return pd.DataFrame(columns=["food", "carbs_per_100g"])
     out = pd.DataFrame()
     out["food"] = df[name_col].astype(str).str.strip().str.lower()
     out["carbs_per_100g"] = pd.to_numeric(df[carbs_col], errors="coerce")
@@ -174,18 +175,18 @@ def load_gi(path="glucy-pred/data/lookup/glycemic_index.csv"):
     try:
         df = pd.read_csv(path)
     except Exception:
-        return pd.DataFrame(columns=["food","gi"])
-    name_col = next((c for c in ["food","aliment","Aliment","label","name"] if c in df.columns), None)
-    gi_col = next((c for c in ["gi","IG","ig"] if c in df.columns), None)
+        return pd.DataFrame(columns=["food", "gi"])
+    name_col = next((c for c in ["food", "aliment", "Aliment", "label", "name"] if c in df.columns), None)
+    gi_col = next((c for c in ["gi", "IG", "ig"] if c in df.columns), None)
     if not name_col or not gi_col:
-        return pd.DataFrame(columns=["food","gi"])
+        return pd.DataFrame(columns=["food", "gi"])
     out = pd.DataFrame()
     out["food"] = df[name_col].astype(str).str.strip().str.lower()
     out["gi"] = pd.to_numeric(df[gi_col], errors="coerce")
     return out.dropna()
 
 ALIASES = {
-    # anglais -> français (quelques exemples utiles)
+    # english -> french (examples)
     "rice": "riz",
     "green beans": "haricot vert",
     "beans": "haricot",
@@ -208,23 +209,19 @@ ALIASES = {
 
 def _ensure_percent(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Tente de construire percent_total à partir de:
-      - percent_total (déjà présent),
-      - area_ratio (0..1 ou 0..100),
-      - area_pixels (normalisation par la somme),
-      - bboxes (x1,y1,x2,y2) ou (width,height) ou bbox [x,y,w,h].
+    Build percent_total from any available signal: area_ratio, area_pixels, or bboxes.
     """
     if "percent_total" in df.columns:
         return df
 
-    # ratio directement ?
+    # ratio directly 0..1 or 0..100
     if "area_ratio" in df.columns:
         r = pd.to_numeric(df["area_ratio"], errors="coerce")
         if r.max(skipna=True) is not None:
             df["percent_total"] = r * (100.0 if r.max(skipna=True) <= 1.5 else 1.0)
             return df
 
-    # aires de masques
+    # mask areas
     if "area_pixels" in df.columns:
         a = pd.to_numeric(df["area_pixels"], errors="coerce")
         s = a.sum(skipna=True)
@@ -233,7 +230,7 @@ def _ensure_percent(df: pd.DataFrame) -> pd.DataFrame:
             return df
 
     # bboxes (x1,y1,x2,y2)
-    if {"x1","y1","x2","y2"}.issubset(df.columns):
+    if {"x1", "y1", "x2", "y2"}.issubset(df.columns):
         w = pd.to_numeric(df["x2"], errors="coerce") - pd.to_numeric(df["x1"], errors="coerce")
         h = pd.to_numeric(df["y2"], errors="coerce") - pd.to_numeric(df["y1"], errors="coerce")
         area = (w.clip(lower=0) * h.clip(lower=0)).fillna(0)
@@ -243,7 +240,7 @@ def _ensure_percent(df: pd.DataFrame) -> pd.DataFrame:
             return df
 
     # bboxes (width,height)
-    if {"width","height"}.issubset(df.columns):
+    if {"width", "height"}.issubset(df.columns):
         area = (pd.to_numeric(df["width"], errors="coerce").clip(lower=0) *
                 pd.to_numeric(df["height"], errors="coerce").clip(lower=0)).fillna(0)
         s = area.sum()
@@ -251,7 +248,7 @@ def _ensure_percent(df: pd.DataFrame) -> pd.DataFrame:
             df["percent_total"] = 100.0 * area / s
             return df
 
-    # bbox vectorisée [x,y,w,h]
+    # bbox vector [x,y,w,h]
     if "bbox" in df.columns:
         def _area_from_bbox(v):
             try:
@@ -271,12 +268,14 @@ def _ensure_percent(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def enrich_with_nutrition(df_in: pd.DataFrame, total_weight_g: int) -> pd.DataFrame:
-    """Complète label/percent/weight_g puis calcule carbs_g (CIQUAL) et ajoute gi."""
+    """
+    Ensure label/percent_total/weight_g then compute carbs_g (CIQUAL) and add GI if present.
+    """
     df = df_in.copy()
 
     # label
     if "label" not in df.columns:
-        for c in ["name","class","class_name","label_name"]:
+        for c in ["name", "class", "class_name", "label_name"]:
             if c in df.columns:
                 df["label"] = df[c].astype(str)
                 break
@@ -284,36 +283,34 @@ def enrich_with_nutrition(df_in: pd.DataFrame, total_weight_g: int) -> pd.DataFr
     # percent
     df = _ensure_percent(df)
 
-    # poids (si pas fourni) à partir du % et du poids total
+    # weight from percent_total if missing
     if "weight_g" not in df.columns and "percent_total" in df.columns:
         perc = pd.to_numeric(df["percent_total"], errors="coerce")
         if perc.max(skipna=True) is not None and perc.max(skipna=True) <= 1.5:
             perc = perc * 100.0
         df["weight_g"] = total_weight_g * (perc / 100.0)
 
-    # si toujours pas de poids → on ne peut pas calculer les glucides
     if "weight_g" not in df.columns:
-        return df
+        return df  # cannot compute carbs without weights
 
-    # clé d'appariement pour CIQUAL/IG
+    # key for matching to CIQUAL/GI
     if "label" in df.columns:
         df["__k"] = df["label"].astype(str).str.strip().str.lower()
         df["__k"] = df["__k"].map(lambda x: ALIASES.get(x, x))
 
-    # CIQUAL → carbs
+    # CIQUAL -> carbs
     ciqual = load_ciqual()
     if not ciqual.empty and "__k" in df.columns:
         df = df.merge(ciqual, left_on="__k", right_on="food", how="left").drop(columns=["food"])
         if "carbs_g" not in df.columns and "carbs_per_100g" in df.columns:
             df["carbs_g"] = df["weight_g"] * df["carbs_per_100g"] / 100.0
 
-    # IG optionnel
+    # GI optional
     gi = load_gi()
     if not gi.empty and "__k" in df.columns and "gi" not in df.columns:
         df = df.merge(gi, left_on="__k", right_on="food", how="left").drop(columns=["food"])
 
-    # ordre
-    nice = [c for c in ["label","percent_total","weight_g","carbs_g","gi","confidence"] if c in df.columns]
+    nice = [c for c in ["label", "percent_total", "weight_g", "carbs_g", "gi", "confidence"] if c in df.columns]
     st.session_state.diag["enriched_cols"] = list(df.columns)
     return df[nice] if nice else df
 
@@ -322,7 +319,7 @@ left, right = st.columns([1, 1])
 
 with left:
     st.subheader("📤 Importer une image")
-    file = st.file_uploader("Choisir une image", type=["jpg","jpeg","png"])
+    file = st.file_uploader("Choisir une image", type=["jpg", "jpeg", "png"])
     analyze = st.button("✅ Analyser") if file else None
 
     if file and analyze:
@@ -368,5 +365,3 @@ with right:
 with st.expander("🛠️ Diagnostics"):
     for k, v in st.session_state.diag.items():
         st.write(f"**{k}**:", v)
-
-
